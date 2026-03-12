@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/boot/boot",
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/favorite/favorite"
+  ],
+  "window": {
+    "navigationBarTitleText": "宝宝今日食",
+    "navigationBarBackgroundColor": "#ffd6df",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fff4f7",
+    "backgroundColorTop": "#fff0f5",
+    "backgroundColorBottom": "#fff7f8"
+  },
+  "tabBar": {
+    "color": "#a58a91",
+    "selectedColor": "#ff7fa2",
+    "backgroundColor": "#fffafb",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tab-home.png",
+        "selectedIconPath": "assets/tab-home-selected.png"
+      },
+      {
+        "pagePath": "pages/favorite/favorite",
+        "text": "收藏",
+        "iconPath": "assets/tab-favorite.png",
+        "selectedIconPath": "assets/tab-favorite-selected.png"
+      }
+    ]
+  }
+}

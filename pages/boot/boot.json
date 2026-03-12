@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "宝宝今日食",
+  "navigationStyle": "custom",
+  "disableScroll": true,
+  "backgroundColor": "#fff4f7",
+  "backgroundColorTop": "#fff0f5",
+  "backgroundColorBottom": "#fff7f8"
+}

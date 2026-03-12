@@ -1,0 +1,106 @@
+<view class="container">
+  <view class="card favoriteHeroCard">
+    <view class="title">💗 我的收藏小餐单</view>
+    <view class="muted">把喜欢的辅食存起来，随时回来看。</view>
+  </view>
+
+  <view class="card searchCard">
+    <view class="searchWrap">
+      <view class="searchIcon">🔎</view>
+      <input
+        class="searchInput"
+        type="text"
+        value="{{keyword}}"
+        placeholder="搜索菜名、类型、食材，比如“南瓜”或“鸡蛋”"
+        placeholder-class="searchPlaceholder"
+        bindinput="onKeywordInput"
+        confirm-type="search"
+      />
+      <view wx:if="{{keyword}}" class="searchClear" bindtap="clearKeyword">×</view>
+    </view>
+  </view>
+
+  <view wx:if="{{isLoading}}" class="card empty">
+    <view class="loadingDotWrap">
+      <view class="loadingDot"></view>
+      <view class="loadingDot"></view>
+      <view class="loadingDot"></view>
+    </view>
+    <view class="title">正在整理收藏</view>
+    <view class="muted">稍等一下，喜欢的小菜单马上出现。</view>
+  </view>
+
+  <view wx:if="{{!isLoading && !fullList.length}}" class="card empty">
+    <view class="title">还没有收藏</view>
+    <view class="muted">去详情页点一下爱心，这里就会出现喜欢的小菜单。</view>
+  </view>
+
+  <view wx:if="{{!isLoading && fullList.length && !list.length}}" class="card empty">
+    <view class="title">没有找到匹配结果</view>
+    <view class="muted">试试输入菜名、类型或食材中的任意字符。</view>
+  </view>
+
+  <view wx:if="{{!isLoading && list.length}}" class="stack">
+    <view wx:for="{{list}}" wx:key="id" class="card item favoriteCard" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="row cardTop">
+        <view class="titleRow">
+          <view class="pill">
+            <text
+              wx:for="{{item.typeSegments}}"
+              wx:key="idx"
+              wx:for-item="segment"
+              wx:for-index="idx"
+              class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+            >{{segment.text}}</text>
+          </view>
+          <view class="cardTitleInline">
+            <text
+              wx:for="{{item.titleSegments}}"
+              wx:key="idx"
+              wx:for-item="segment"
+              wx:for-index="idx"
+              class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+            >{{segment.text}}</text>
+          </view>
+        </view>
+        <view class="iconFavoriteBtn iconFavoriteBtnActive" catchtap="toggleFavorite" data-id="{{item.id}}">
+          <view class="favoriteHeart favoriteHeartActive"><view class="favoriteHeartInner favoriteHeartInnerActive"></view></view>
+        </view>
+      </view>
+      <view class="muted compactMuted">
+        <text
+          wx:for="{{item.timeSegments}}"
+          wx:key="idx"
+          wx:for-item="segment"
+          wx:for-index="idx"
+          class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+        >{{segment.text}}</text>
+      </view>
+      <view wx:if="{{item.matchHint}}" class="matchHint">
+        <text class="matchHintLabel">命中{{item.matchHint.label}}：</text>
+        <text
+          wx:for="{{item.matchHint.segments}}"
+          wx:key="idx"
+          wx:for-item="segment"
+          wx:for-index="idx"
+          class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+        >{{segment.text}}</text>
+      </view>
+      <view class="ingredientTags">
+        <view wx:for="{{item.ingredientTags}}" wx:key="key" wx:for-item="ingredientTag" class="ingredientTag">
+          <text
+            wx:for="{{ingredientTag.segments}}"
+            wx:key="idx"
+            wx:for-item="segment"
+            wx:for-index="idx"
+            class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+          >{{segment.text}}</text>
+        </view>
+      </view>
+      <view class="row actions">
+        <view class="cardSpacer"></view>
+        <view class="btn viewBtn actionBtn">查看做法</view>
+      </view>
+    </view>
+  </view>
+</view>

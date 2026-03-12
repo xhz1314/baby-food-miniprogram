@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "今日推荐",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "backgroundColor": "#fff4f7",
+  "backgroundColorTop": "#fff0f5",
+  "backgroundColorBottom": "#fff7f8"
+}

@@ -1,0 +1,97 @@
+<view class="container">
+  <view class="card heroCard">
+    <view class="heroTitleRow">
+      <view class="kicker">🍓 宝贝今日食</view>
+      <view class="heroTitle">{{titleText}}</view>
+    </view>
+    <view class="muted heroSubtitle">{{subtitleText}}</view>
+    <view class="switchTip">{{roundText}}</view>
+    <view wx:if="{{stageText}}" class="infoText">{{stageText}}</view>
+    <view wx:if="{{seasonText}}" class="seasonRow">
+      <view class="infoText seasonText">{{seasonText}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{errorText}}" class="card errorCard">
+    <view class="title">小餐盘还没摆好</view>
+    <view class="muted">{{errorText}}</view>
+  </view>
+
+  <view wx:if="{{!errorText && !plan}}" class="card loadingCard">
+    <view class="loadingDotWrap">
+      <view class="loadingDot"></view>
+      <view class="loadingDot"></view>
+      <view class="loadingDot"></view>
+    </view>
+    <view class="title">正在准备今日菜单</view>
+    <view class="muted">第一次打开可能会慢一点点，请稍等。</view>
+  </view>
+
+  <view wx:if="{{!errorText && plan}}" class="grid">
+    <view class="card item menuCard stapleCard" bindtap="goDetail" data-id="{{plan.staple.id}}">
+      <view class="row cardTop">
+        <view class="titleRow">
+          <view class="pill">🍚 主食</view>
+          <view class="cardTitleInline">{{plan.staple.name}}</view>
+        </view>
+        <view class="iconFavoriteBtn {{plan.staple.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{plan.staple.id}}">
+          <view class="favoriteHeart {{plan.staple.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{plan.staple.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
+        </view>
+      </view>
+      <view class="muted compactMuted">温柔饱腹，约 {{plan.staple.timeMinutes}} 分钟</view>
+      <view class="ingredientTags">
+        <view wx:for="{{plan.staple.ingredients}}" wx:key="name" class="ingredientTag">
+          {{item.name}} {{item.amount}}
+        </view>
+      </view>
+      <view class="row actions">
+        <view class="cardSpacer"></view>
+        <view class="btn viewBtn actionBtn">查看做法</view>
+      </view>
+    </view>
+
+    <view class="card item menuCard proteinCard" bindtap="goDetail" data-id="{{plan.protein.id}}">
+      <view class="row cardTop">
+        <view class="titleRow">
+          <view class="pill">🥚 蛋白质</view>
+          <view class="cardTitleInline">{{plan.protein.name}}</view>
+        </view>
+        <view class="iconFavoriteBtn {{plan.protein.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{plan.protein.id}}">
+          <view class="favoriteHeart {{plan.protein.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{plan.protein.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
+        </view>
+      </view>
+      <view class="muted compactMuted">营养满满，约 {{plan.protein.timeMinutes}} 分钟</view>
+      <view class="ingredientTags">
+        <view wx:for="{{plan.protein.ingredients}}" wx:key="name" class="ingredientTag">
+          {{item.name}} {{item.amount}}
+        </view>
+      </view>
+      <view class="row actions">
+        <view class="cardSpacer"></view>
+        <view class="btn viewBtn actionBtn">查看做法</view>
+      </view>
+    </view>
+
+    <view wx:for="{{plan.vegs}}" wx:key="id" class="card item menuCard vegCard" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="row cardTop">
+        <view class="titleRow">
+          <view class="pill">🥬 蔬菜</view>
+          <view class="cardTitleInline">{{item.name}}</view>
+        </view>
+        <view class="iconFavoriteBtn {{item.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{item.id}}">
+          <view class="favoriteHeart {{item.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{item.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
+        </view>
+      </view>
+      <view class="muted compactMuted">清甜时令，约 {{item.timeMinutes}} 分钟</view>
+      <view class="ingredientTags">
+        <view wx:for="{{item.ingredients}}" wx:key="name" class="ingredientTag">
+          {{item.name}} {{item.amount}}
+        </view>
+      </view>
+      <view class="row actions">
+        <view class="cardSpacer"></view>
+        <view class="btn viewBtn actionBtn">查看做法</view>
+      </view>
+    </view>
+  </view>
+</view>

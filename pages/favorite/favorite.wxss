@@ -1,0 +1,329 @@
+.favoriteHeroCard {
+  margin-bottom: 18rpx;
+  background: linear-gradient(180deg, #fff8fb 0%, #fff3f7 100%);
+}
+
+.searchCard {
+  margin-bottom: 18rpx;
+  padding: 18rpx 18rpx;
+}
+
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 16rpx;
+  border-radius: 999rpx;
+  background: #fff8fb;
+  border: 2rpx solid #ffdbe7;
+}
+
+.searchIcon {
+  font-size: 24rpx;
+  color: #d596a8;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 56rpx;
+  font-size: 25rpx;
+  color: #6a575d;
+}
+
+.searchPlaceholder {
+  color: #c0a6ae;
+}
+
+.searchClear {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #ffeaf1;
+  color: #da88a2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.empty {
+  margin-top: 12rpx;
+  text-align: center;
+}
+
+.favoriteCard {
+  background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 18rpx 18rpx;
+}
+
+.favoriteCard::before {
+  display: none;
+}
+
+.cardTop {
+  align-items: flex-start;
+  gap: 10rpx;
+}
+
+.titleRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  min-width: 0;
+  padding-right: 8rpx;
+}
+
+.cardTitleInline {
+  flex: 1;
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5f4a52;
+  line-height: 1.35;
+}
+
+.compactMuted {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+}
+
+.matchHint {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: #b08a94;
+  position: relative;
+  z-index: 1;
+}
+
+.matchHintLabel {
+  color: #d596a8;
+}
+
+.ingredientTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 10rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.ingredientTag {
+  max-width: 100%;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2rpx solid #ffe4ec;
+  color: #8f6d76;
+  font-size: 21rpx;
+  line-height: 1.25;
+}
+
+.keywordHighlightText {
+  color: #ff5f8f;
+  background: rgba(255, 210, 225, 0.58);
+  border-radius: 10rpx;
+  padding: 0 3rpx;
+}
+
+.actions {
+  margin-top: 10rpx;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.cardSpacer {
+  flex: 1;
+}
+
+.actionBtn {
+  padding: 12rpx 18rpx;
+  font-size: 23rpx;
+  line-height: 1.2;
+}
+
+.viewBtn {
+  background: linear-gradient(135deg, #ff9fba 0%, #ffb68e 100%);
+  color: #ffffff;
+  box-shadow: 0 10rpx 20rpx rgba(255, 159, 186, 0.18);
+}
+
+@keyframes favoritePulse {
+  0% {
+    transform: scale(0.94);
+  }
+
+  70% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.iconFavoriteBtn {
+  width: 58rpx;
+  height: 58rpx;
+  min-width: 58rpx;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fffefd 0%, #fff9fa 100%);
+  border: 2rpx solid #ecdde3;
+  box-shadow: 0 6rpx 12rpx rgba(227, 203, 211, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.iconFavoriteBtn::before {
+  content: "";
+  position: absolute;
+  top: 10rpx;
+  left: 12rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.iconFavoriteBtnActive {
+  background: linear-gradient(180deg, #fff1f6 0%, #ffdce7 100%);
+  border-color: #f3bccd;
+  box-shadow: 0 10rpx 18rpx rgba(238, 166, 191, 0.22);
+  animation: favoritePulse 0.24s ease-out;
+}
+
+.iconFavoriteBtnActive::after {
+  content: "✦";
+  position: absolute;
+  top: 6rpx;
+  right: 8rpx;
+  font-size: 16rpx;
+  line-height: 1;
+  color: #f5b8cb;
+}
+
+.favoriteHeart {
+  width: 20rpx;
+  height: 18rpx;
+  position: relative;
+  transform: rotate(-45deg);
+  border-radius: 4rpx;
+  background: #d6bcc5;
+}
+
+.favoriteHeart::before,
+.favoriteHeart::after {
+  content: "";
+  position: absolute;
+  width: 20rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.favoriteHeart::before {
+  top: -9rpx;
+  left: 0;
+}
+
+.favoriteHeart::after {
+  top: 0;
+  left: 9rpx;
+}
+
+.favoriteHeartActive {
+  background: #ef88a6;
+  transform: rotate(-45deg) scale(1.08);
+}
+
+.favoriteHeartInner {
+  width: 11rpx;
+  height: 10rpx;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  border-radius: 3rpx;
+  background: #fffdfd;
+}
+
+.favoriteHeartInner::before,
+.favoriteHeartInner::after {
+  content: "";
+  position: absolute;
+  width: 11rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.favoriteHeartInner::before {
+  top: -5rpx;
+  left: 0;
+}
+
+.favoriteHeartInner::after {
+  top: 0;
+  left: 5rpx;
+}
+
+.favoriteHeartInnerActive {
+  width: 6rpx;
+  height: 5rpx;
+  top: 2rpx;
+  left: 7rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.favoriteHeartInnerActive::before,
+.favoriteHeartInnerActive::after {
+  width: 6rpx;
+  height: 5rpx;
+}
+
+.favoriteHeartInnerActive::before {
+  top: -2rpx;
+  left: 0;
+}
+
+.favoriteHeartInnerActive::after {
+  top: 0;
+  left: 2rpx;
+}
+
+.iconFavoriteBtn::after {
+  border: none;
+}
+
+.loadingDotWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  margin-bottom: 12rpx;
+}
+
+.loadingDot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #f3bfd0;
+  opacity: 0.9;
+}
