@@ -204,7 +204,7 @@ function buildResolvedRecipe(record, date) {
     snapshotRecipe.steps = ["这是收藏快照，当前版本未找到对应实时菜谱。"]
   }
   if (!snapshotRecipe.tips.length) {
-    snapshotRecipe.tips = ["小程序更新后仍保留了这份收藏记录，可继续作为参考。"]
+    snapshotRecipe.tips = ["小程序更新后仍保留了这份收藏记录，可继续查看制作内容。"]
   }
 
   return Object.assign(snapshotRecipe, {

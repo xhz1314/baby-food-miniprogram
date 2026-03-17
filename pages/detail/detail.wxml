@@ -5,13 +5,13 @@
       <view class="loadingDot"></view>
       <view class="loadingDot"></view>
     </view>
-    <view class="title">正在准备做法</view>
-    <view class="muted">马上就把这份小菜单端上来。</view>
+    <view class="title">正在加载菜谱</view>
+    <view class="muted">马上就把这份小菜谱端上来。</view>
   </view>
 
   <view wx:if="{{!isLoading && !recipe}}" class="card cuteEmptyCard">
     <view class="title">这份食谱走丢啦</view>
-    <view class="muted">请从首页重新挑一份小可爱菜单。</view>
+    <view class="muted">请从首页重新挑一份小可爱菜谱。</view>
   </view>
 
   <view wx:if="{{!isLoading && recipe}}">
@@ -19,12 +19,10 @@
       <view class="row detailTopRow">
         <view class="detailTitleWrap">
           <view class="titleRow">
-            <view class="pill heroType">{{recipe.type === 'staple' ? '🍚 主食' : (recipe.type === 'protein' ? '🥚 蛋白质' : '🥬 蔬菜')}}</view>
+            <view class="pill heroType">{{recipe.type === 'staple' ? '🍚 主食' : (recipe.type === 'protein' ? '🥚 蛋白质' : (recipe.type === 'soup' ? '🍲 汤羹' : '🥬 蔬菜'))}}</view>
             <view class="detailTitleInline">{{recipe.name}}</view>
           </view>
           <view class="muted">预计用时：{{recipe.timeMinutes}} 分钟</view>
-          <view wx:if="{{recipe.ageDisplayText || recipe.ageStageName}}" class="muted">适配月龄：{{recipe.ageDisplayText}}<text wx:if="{{recipe.ageDisplayText && recipe.ageStageName}}"> · </text>{{recipe.ageStageName}}</view>
-          <view wx:if="{{recipe.textureLabel}}" class="muted">口感建议：{{recipe.textureLabel}}</view>
           <view wx:if="{{recipe.isSnapshotFallback}}" class="snapshotNotice">这是收藏快照，原食谱更新后依然帮你保留下来啦。</view>
         </view>
         <view class="iconFavoriteBtn {{isFavorite ? 'iconFavoriteBtnActive' : ''}}" bindtap="toggleFavorite">
@@ -52,13 +50,6 @@
           <view class="num">{{index + 1}}</view>
           <view class="txt">{{item}}</view>
         </view>
-      </view>
-    </view>
-
-    <view wx:if="{{recipe.tips && recipe.tips.length}}" class="card section tipCard">
-      <view class="sectionTitle">💡 小提示</view>
-      <view class="list">
-        <view wx:for="{{recipe.tips}}" wx:key="*this" class="tip">{{item}}</view>
       </view>
     </view>
   </view>

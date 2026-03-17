@@ -1,8 +1,8 @@
 <view class="bootPage">
   <view class="bootMain">
     <view class="bootBadge">宝宝今日食</view>
-    <view class="bootTitle">正在准备今日菜单</view>
-    <view class="bootSubtitle">马上就好，先把营养搭配准备好。</view>
+    <view class="bootTitle">正在准备菜谱库</view>
+    <view class="bootSubtitle">马上就好，先把常用菜谱整理好。</view>
     <view class="loadingDotWrap">
       <view class="loadingDot loadingDotOne"></view>
       <view class="loadingDot loadingDotTwo"></view>

@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "今日推荐",
-  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "宝宝餐",
+  "enablePullDownRefresh": false,
   "backgroundTextStyle": "dark",
   "backgroundColor": "#fff4f7",
   "backgroundColorTop": "#fff0f5",

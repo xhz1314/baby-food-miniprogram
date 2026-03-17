@@ -1,4 +1,5 @@
 let favoritesModule = null
+let dataModule = null
 
 function hideBootLoading() {
   try {
@@ -11,6 +12,13 @@ function getFavoritesModule() {
     favoritesModule = require("../../utils/favorites")
   }
   return favoritesModule
+}
+
+function getDataModule() {
+  if (!dataModule) {
+    dataModule = require("../../utils/data")
+  }
+  return dataModule
 }
 
 const SEPARATOR_REGEXP = /[\s|/、，,。；;：:（）()【】\[\]\-]/
@@ -27,13 +35,48 @@ const SEARCH_ALIASES = {
 function getTypeText(type) {
   if (type === "staple") return "主食"
   if (type === "protein") return "蛋白质"
+  if (type === "soup") return "汤羹"
   return "蔬菜"
 }
 
 function getTypeLabel(type) {
   if (type === "staple") return "🍚 主食"
   if (type === "protein") return "🥚 蛋白质"
+  if (type === "soup") return "🍲 汤羹"
   return "🥬 蔬菜"
+}
+
+function getSeasonLabel(seasonKey) {
+  if (seasonKey === "spring") return "春季"
+  if (seasonKey === "summer") return "夏季"
+  if (seasonKey === "autumn") return "秋季"
+  if (seasonKey === "winter") return "冬季"
+  return "多季可做"
+}
+
+function buildSeasonLabelMap() {
+  const allRecipes = getDataModule().getRecipeList()
+  const recipeRecordMap = {}
+
+  allRecipes.forEach((item) => {
+    const key = `${item.type || ""}::${item.name || ""}`
+    if (!recipeRecordMap[key]) {
+      recipeRecordMap[key] = {
+        seasonMap: {}
+      }
+    }
+
+    if (item.seasonKey) {
+      recipeRecordMap[key].seasonMap[item.seasonKey] = true
+    }
+  })
+
+  Object.keys(recipeRecordMap).forEach((key) => {
+    const seasonKeys = Object.keys(recipeRecordMap[key].seasonMap)
+    recipeRecordMap[key].seasonLabel = seasonKeys.length > 1 ? "多季可做" : getSeasonLabel(seasonKeys[0])
+  })
+
+  return recipeRecordMap
 }
 
 function normalizeText(value) {
@@ -69,19 +112,16 @@ function buildSearchEntries(item) {
   return [
     { text: item.name, visible: true, label: "菜名" },
     { text: item.typeLabel, visible: true, label: "分类" },
+    { text: item.seasonLabel, visible: true, label: "季节" },
     { text: `约 ${item.timeMinutes} 分钟`, visible: true, label: "时长" },
     ...ingredients.map((ingredient) => ({
       text: `${ingredient.name} ${ingredient.amount}`,
       visible: true,
       label: "食材"
     })),
-    { text: item.seasonVegetable, visible: false, label: "当季食材" },
-    { text: item.ageDisplayText, visible: false, label: "月龄" },
-    { text: item.ageStageName, visible: false, label: "阶段" },
-    { text: item.textureLabel, visible: false, label: "口感" },
     ...(item.isSnapshotFallback ? [{ text: "收藏快照", visible: false, label: "收藏记录" }] : []),
     ...steps.map((text) => ({ text, visible: false, label: "做法" })),
-    ...tips.map((text) => ({ text, visible: false, label: "小贴士" }))
+    ...tips.map((text) => ({ text, visible: false, label: "备注" }))
   ].filter((entry) => normalizeText(entry.text))
 }
 
@@ -118,10 +158,14 @@ function expandKeywords(keyword) {
 }
 
 function buildList() {
+  const seasonLabelMap = buildSeasonLabelMap()
+
   return getFavoritesModule().getFavoriteRecipes().map((item) => {
     const nextItem = { ...item, isFavorite: true }
+    const seasonKey = `${nextItem.type || ""}::${nextItem.name || ""}`
     nextItem.typeText = getTypeText(nextItem.type)
     nextItem.typeLabel = getTypeLabel(nextItem.type)
+    nextItem.seasonLabel = (seasonLabelMap[seasonKey] && seasonLabelMap[seasonKey].seasonLabel) || getSeasonLabel(nextItem.seasonKey)
     nextItem.timeText = `约 ${nextItem.timeMinutes} 分钟`
     nextItem.searchEntries = buildSearchEntries(nextItem)
     nextItem.searchFields = nextItem.searchEntries.map((entry) => normalizeText(entry.text))
@@ -258,6 +302,7 @@ function buildMatchHint(entry, match) {
 function decorateItem(item, keywordVariants) {
   const titleSegments = buildHighlightSegments(item.name, keywordVariants)
   const typeSegments = buildHighlightSegments(item.typeLabel, keywordVariants)
+  const seasonSegments = buildHighlightSegments(item.seasonLabel, keywordVariants)
   const timeSegments = buildHighlightSegments(item.timeText, keywordVariants)
   const ingredientTags = (Array.isArray(item.ingredients) ? item.ingredients : []).map((ingredient, index) => {
     return {
@@ -269,6 +314,7 @@ function decorateItem(item, keywordVariants) {
   const hasVisibleHighlight =
     hasHighlightedSegment(titleSegments) ||
     hasHighlightedSegment(typeSegments) ||
+    hasHighlightedSegment(seasonSegments) ||
     hasHighlightedSegment(timeSegments) ||
     ingredientTags.some((ingredientTag) => hasHighlightedSegment(ingredientTag.segments))
 
@@ -285,6 +331,7 @@ function decorateItem(item, keywordVariants) {
   return Object.assign({}, item, {
     titleSegments,
     typeSegments,
+    seasonSegments,
     timeSegments,
     ingredientTags,
     matchHint
