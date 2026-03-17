@@ -1,7 +1,21 @@
 var dataModule = null
 var favoritesModule = null
 
-var HOME_PAGE_CACHE_KEY = "home_page_render_cache"
+var SEASON_OPTIONS = [
+  { key: "all", label: "全部" },
+  { key: "spring", label: "春季" },
+  { key: "summer", label: "夏季" },
+  { key: "autumn", label: "秋季" },
+  { key: "winter", label: "冬季" }
+]
+
+var CATEGORY_OPTIONS = [
+  { key: "all", label: "全部" },
+  { key: "staple", label: "主食" },
+  { key: "protein", label: "蛋白质" },
+  { key: "veg", label: "蔬菜" },
+  { key: "soup", label: "汤羹" }
+]
 
 function hideBootLoading() {
   try {
@@ -23,18 +37,50 @@ function getFavoritesModule() {
   return favoritesModule
 }
 
-function readStorage(key) {
-  try {
-    return wx.getStorageSync(key)
-  } catch (error) {
-    return null
+function getTypeLabel(type) {
+  if (type === "staple") {
+    return "🍚 主食"
   }
+
+  if (type === "protein") {
+    return "🥚 蛋白质"
+  }
+
+  if (type === "soup") {
+    return "🍲 汤羹"
+  }
+
+  return "🥬 蔬菜"
 }
 
-function writeStorage(key, value) {
-  try {
-    wx.setStorageSync(key, value)
-  } catch (error) {}
+function getCardClass(type) {
+  if (type === "staple") {
+    return "stapleCard"
+  }
+
+  if (type === "protein") {
+    return "proteinCard"
+  }
+
+  if (type === "soup") {
+    return "soupCard"
+  }
+
+  return "vegCard"
+}
+
+function getSeasonLabel(seasonKey) {
+  var seasonOption = SEASON_OPTIONS.find(function (item) {
+    return item.key === seasonKey
+  })
+
+  return seasonOption ? seasonOption.label : "全部"
+}
+
+function buildSummaryText(recipe, seasonText) {
+  var ingredients = Array.isArray(recipe && recipe.ingredients) ? recipe.ingredients : []
+  var nextSeasonText = seasonText || getSeasonLabel(recipe && recipe.seasonKey)
+  return nextSeasonText + " · 食材 " + ingredients.length + " 种 · 约 " + recipe.timeMinutes + " 分钟"
 }
 
 function markRecipeFavorite(recipe, favoriteIds) {
@@ -44,79 +90,116 @@ function markRecipeFavorite(recipe, favoriteIds) {
 
   var nextRecipe = Object.assign({}, recipe)
   nextRecipe.isFavorite = favoriteIds.indexOf(recipe.id) > -1
+  nextRecipe.typeLabel = getTypeLabel(recipe.type)
+  nextRecipe.cardClass = getCardClass(recipe.type)
+  nextRecipe.seasonLabel = getSeasonLabel(recipe.seasonKey)
+  nextRecipe.summaryText = buildSummaryText(recipe, nextRecipe.seasonLabel)
   return nextRecipe
 }
 
-function attachFavoriteState(plan, favoriteIds) {
-  if (!plan) {
-    return null
-  }
-
-  var resolvedFavoriteIds = Array.isArray(favoriteIds) ? favoriteIds : getFavoritesModule().getFavoriteIds()
-  return {
-    dateText: plan.dateText,
-    birthdayText: plan.birthdayText,
-    season: plan.season,
-    ageInfo: plan.ageInfo,
-    staple: markRecipeFavorite(plan.staple, resolvedFavoriteIds),
-    protein: markRecipeFavorite(plan.protein, resolvedFavoriteIds),
-    vegs: Array.isArray(plan.vegs)
-      ? plan.vegs.map(function (recipe) {
-          return markRecipeFavorite(recipe, resolvedFavoriteIds)
-        })
-      : []
-  }
+function buildRecipeList(favoriteIds) {
+  var recipes = getDataModule().getRecipeList()
+  return recipes.map(function (recipe) {
+    return markRecipeFavorite(recipe, favoriteIds)
+  })
 }
 
-function buildPageState(plan, refreshSeed) {
-  var ageText = plan && plan.ageInfo ? plan.ageInfo.displayText : ""
-  var stageText = ""
-  var seasonText = ""
+function deduplicateRecipeList(list, seasonKey, categoryKey) {
+  var shouldDeduplicate = seasonKey === "all" || categoryKey === "all"
+  var deduplicatedList = []
+  var recordMap = {}
 
-  if (plan && plan.ageInfo) {
-    stageText = "成长阶段：" + plan.ageInfo.stageName + " · " + plan.ageInfo.textureLabel
+  if (!Array.isArray(list)) {
+    return []
   }
 
-  if (plan && plan.season) {
-    seasonText =
-      plan.dateText +
-      " · 上海" +
-      plan.season.name +
-      "（" +
-      plan.season.monthLabel +
-      "） · 当季代表：" +
-      plan.season.featuredVegetable
+  if (!shouldDeduplicate) {
+    return list.slice()
   }
 
-  return {
-    plan: plan,
-    titleText: ageText ? "今日推荐（" + ageText + "）" : "今日推荐",
-    subtitleText: "软糯主食 + 优质蛋白 + 当季蔬菜",
-    roundText: "今日第 " + (refreshSeed + 1) + " 组菜单，下拉可切换下一组",
-    stageText: stageText,
-    seasonText: seasonText,
-    errorText: ""
-  }
-}
+  list.forEach(function (recipe) {
+    var key
+    var record
+    var seasonText
 
-function findRecipeInPlan(plan, id) {
-  if (!plan || !id) {
-    return null
-  }
+    if (!recipe) {
+      return
+    }
 
-  if (plan.staple && plan.staple.id === id) {
-    return plan.staple
-  }
+    key = (recipe.type || "") + "::" + (recipe.name || "")
+    record = recordMap[key]
 
-  if (plan.protein && plan.protein.id === id) {
-    return plan.protein
-  }
-
-  if (Array.isArray(plan.vegs)) {
-    for (var i = 0; i < plan.vegs.length; i += 1) {
-      if (plan.vegs[i] && plan.vegs[i].id === id) {
-        return plan.vegs[i]
+    if (!record) {
+      record = {
+        recipe: Object.assign({}, recipe),
+        seasonMap: {},
+        seasonCount: 0
       }
+      recordMap[key] = record
+      deduplicatedList.push(record)
+    }
+
+    if (recipe.isFavorite && !record.recipe.isFavorite) {
+      record.recipe = Object.assign({}, recipe)
+    }
+
+    record.recipe.isFavorite = !!(record.recipe.isFavorite || recipe.isFavorite)
+
+    if (recipe.seasonKey && !record.seasonMap[recipe.seasonKey]) {
+      record.seasonMap[recipe.seasonKey] = true
+      record.seasonCount += 1
+    }
+
+    seasonText = record.seasonCount > 1 ? "多季可做" : getSeasonLabel(record.recipe.seasonKey)
+    record.recipe.seasonLabel = seasonText
+    record.recipe.summaryText = buildSummaryText(record.recipe, seasonText)
+  })
+
+  return deduplicatedList.map(function (record) {
+    return record.recipe
+  })
+}
+
+function filterRecipeList(list, seasonKey, categoryKey) {
+  var filteredList
+
+  if (!Array.isArray(list)) {
+    return []
+  }
+
+  filteredList = list.slice()
+
+  if (seasonKey && seasonKey !== "all") {
+    filteredList = filteredList.filter(function (recipe) {
+      return recipe && recipe.seasonKey === seasonKey
+    })
+  }
+
+  if (categoryKey && categoryKey !== "all") {
+    filteredList = filteredList.filter(function (recipe) {
+      return recipe && recipe.type === categoryKey
+    })
+  }
+
+  return deduplicateRecipeList(filteredList, seasonKey, categoryKey)
+}
+
+function buildHeroState(list) {
+  var count = Array.isArray(list) ? list.length : 0
+
+  return {
+    resultCountText: "共 " + count + " 道"
+  }
+}
+
+function findRecipeInList(list, id) {
+  if (!Array.isArray(list) || !id) {
+    return null
+  }
+
+  for (var i = 0; i < list.length; i += 1) {
+    if (list[i] && list[i].id === id) {
+      return list[i]
     }
   }
 
@@ -125,160 +208,113 @@ function findRecipeInPlan(plan, id) {
 
 Page({
   data: {
-    plan: null,
-    refreshSeed: 0,
-    titleText: "今日推荐",
-    subtitleText: "软糯主食 + 优质蛋白 + 当季蔬菜",
-    roundText: "今日第 1 组菜单，下拉可切换下一组",
-    stageText: "",
-    seasonText: "",
-    errorText: ""
+    fullList: [],
+    list: [],
+    seasonOptions: SEASON_OPTIONS,
+    categoryOptions: CATEGORY_OPTIONS,
+    activeSeason: "all",
+    activeCategory: "all",
+    titleText: "宝宝餐",
+    subtitleText: "按季节、分类快速找菜谱",
+    resultCountText: "共 0 道",
+    errorText: "",
+    isLoading: true
   },
   onLoad: function () {
-    this.hydrateFromCache()
-    this.scheduleRefresh(false)
+    this.refreshList()
   },
   onShow: function () {
-    if (!this.data.plan && !this.data.errorText) {
-      this.hydrateFromCache()
-      this.scheduleRefresh(false)
+    if (this.data.isLoading) {
+      this.refreshList()
       return
     }
     this.syncFavoriteState()
   },
-  onPullDownRefresh: function () {
-    var refreshSeed = this.data.refreshSeed + 1
-    this.setData({ refreshSeed: refreshSeed })
-    this.scheduleRefresh(true)
-  },
-  hydrateFromCache: function () {
-    var cachedState = readStorage(HOME_PAGE_CACHE_KEY)
-
-    if (!cachedState || !cachedState.plan) {
-      return false
-    }
-
-    this.setData({
-      plan: cachedState.plan,
-      titleText: cachedState.titleText || "今日推荐",
-      subtitleText: cachedState.subtitleText || "软糯主食 + 优质蛋白 + 当季蔬菜",
-      roundText: cachedState.roundText || "今日第 1 组菜单，下拉可切换下一组",
-      stageText: cachedState.stageText || "",
-      seasonText: cachedState.seasonText || "",
-      errorText: ""
-    })
-    hideBootLoading()
-    return true
-  },
-  cachePageState: function (planOverride) {
-    var nextPlan = planOverride || this.data.plan
-
-    if (!nextPlan) {
-      return
-    }
-
-    writeStorage(HOME_PAGE_CACHE_KEY, {
-      plan: nextPlan,
-      titleText: this.data.titleText,
-      subtitleText: this.data.subtitleText,
-      roundText: this.data.roundText,
-      stageText: this.data.stageText,
-      seasonText: this.data.seasonText
-    })
-  },
-  scheduleRefresh: function (showToast) {
-    var that = this
-    if (this._refreshPending) {
-      return
-    }
-    this._refreshPending = true
-    setTimeout(function () {
-      that._refreshPending = false
-      that.refresh(showToast)
-    }, 0)
-  },
-  scheduleFavoriteSync: function (plan) {
-    var that = this
-    var token
-
-    if (!plan) {
-      return
-    }
-
-    token = (this._favoriteSyncToken || 0) + 1
-    this._favoriteSyncToken = token
-
-    setTimeout(function () {
-      try {
-        var favoriteIds = getFavoritesModule().getFavoriteIds()
-        var nextPlan = attachFavoriteState(plan, favoriteIds)
-        if (that._favoriteSyncToken !== token) {
-          return
-        }
-        that.setData({ plan: nextPlan })
-        that.cachePageState(nextPlan)
-        hideBootLoading()
-      } catch (error) {
-        console.error("首页收藏状态同步失败", error)
-      }
-    }, 0)
-  },
-  syncFavoriteState: function () {
-    this.scheduleFavoriteSync(this.data.plan)
-  },
-  refresh: function (showToast) {
+  refreshList: function () {
     try {
-      var moduleRef = getDataModule()
-      var rawPlan = moduleRef.getTodayPlan(new Date(), this.data.refreshSeed)
-      var basePlan = attachFavoriteState(rawPlan, [])
-      var pageState = buildPageState(basePlan, this.data.refreshSeed)
-
-      this.setData(pageState)
-      this.cachePageState(basePlan)
+      var favoriteIds = getFavoritesModule().getFavoriteIds()
+      var fullList = buildRecipeList(favoriteIds)
+      var list = filterRecipeList(fullList, this.data.activeSeason, this.data.activeCategory)
+      var heroState = buildHeroState(list)
+      this.setData(Object.assign({
+        fullList: fullList,
+        list: list,
+        errorText: "",
+        isLoading: false
+      }, heroState))
       hideBootLoading()
-      this.scheduleFavoriteSync(rawPlan)
-
-      if (showToast) {
-        wx.showToast({
-          title: "已切换到第 " + (this.data.refreshSeed + 1) + " 组",
-          icon: "none"
-        })
-      }
     } catch (error) {
-      console.error("首页菜单生成失败", error)
+      console.error("首页菜谱加载失败", error)
       this.setData({
-        plan: null,
-        titleText: "今日推荐",
-        subtitleText: "软糯主食 + 优质蛋白 + 当季蔬菜",
-        roundText: "今日第 " + (this.data.refreshSeed + 1) + " 组菜单，下拉可切换下一组",
-        stageText: "",
-        seasonText: "",
-        errorText: "菜单加载失败，请下拉重试"
+        fullList: [],
+        list: [],
+        resultCountText: "共 0 道",
+        errorText: "菜谱加载失败，请稍后重试",
+        isLoading: false
       })
       hideBootLoading()
-      wx.showToast({ title: "菜单加载失败", icon: "none" })
-    } finally {
-      if (showToast) {
-        wx.stopPullDownRefresh()
-      }
+      wx.showToast({ title: "菜谱加载失败", icon: "none" })
     }
+  },
+  syncFavoriteState: function () {
+    try {
+      var favoriteIds = getFavoritesModule().getFavoriteIds()
+      var fullList = buildRecipeList(favoriteIds)
+      var list = filterRecipeList(fullList, this.data.activeSeason, this.data.activeCategory)
+      var heroState = buildHeroState(list)
+      this.setData(Object.assign({
+        fullList: fullList,
+        list: list
+      }, heroState))
+    } catch (error) {
+      console.error("首页收藏状态同步失败", error)
+    }
+  },
+  onSeasonChange: function (e) {
+    var seasonKey = e.currentTarget.dataset.season || "all"
+    var list
+    var heroState
+
+    if (seasonKey === this.data.activeSeason) {
+      return
+    }
+
+    list = filterRecipeList(this.data.fullList, seasonKey, this.data.activeCategory)
+    heroState = buildHeroState(list)
+
+    this.setData(Object.assign({
+      activeSeason: seasonKey,
+      list: list
+    }, heroState))
+  },
+  onCategoryChange: function (e) {
+    var categoryKey = e.currentTarget.dataset.category || "all"
+    var list
+    var heroState
+
+    if (categoryKey === this.data.activeCategory) {
+      return
+    }
+
+    list = filterRecipeList(this.data.fullList, this.data.activeSeason, categoryKey)
+    heroState = buildHeroState(list)
+
+    this.setData(Object.assign({
+      activeCategory: categoryKey,
+      list: list
+    }, heroState))
   },
   toggleFavorite: function (e) {
     var id = e.currentTarget.dataset.id
-    var recipe = findRecipeInPlan(this.data.plan, id)
+    var recipe = findRecipeInList(this.data.list, id)
     var nextFavoriteState = false
-    var favoriteIds
-    var nextPlan
 
     if (!id || !recipe) {
       return
     }
 
     nextFavoriteState = getFavoritesModule().toggleFavoriteRecipe(recipe)
-    favoriteIds = getFavoritesModule().getFavoriteIds()
-    nextPlan = attachFavoriteState(this.data.plan, favoriteIds)
-    this.setData({ plan: nextPlan })
-    this.cachePageState(nextPlan)
+    this.syncFavoriteState()
     wx.showToast({
       title: nextFavoriteState ? "已收藏" : "已取消收藏",
       icon: "success"

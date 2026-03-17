@@ -1,95 +1,130 @@
 <view class="container">
   <view class="card heroCard">
-    <view class="heroTitleRow">
-      <view class="kicker">🍓 宝贝今日食</view>
-      <view class="heroTitle">{{titleText}}</view>
+    <view class="heroTopRow">
+      <view class="heroTitleGroup">
+        <view class="heroBadgeTitle">
+          <view class="heroTitleMark"></view>
+          <view class="heroTitle">{{titleText}}</view>
+          <view class="heroTitleMark heroTitleMarkRight"></view>
+        </view>
+        <view class="heroInfoRow">
+          <view class="heroInfoPill">四季菜谱库</view>
+          <view class="muted heroSubtitle">{{subtitleText}}</view>
+        </view>
+      </view>
+      <view class="heroCountTag">{{resultCountText}}</view>
     </view>
-    <view class="muted heroSubtitle">{{subtitleText}}</view>
-    <view class="switchTip">{{roundText}}</view>
-    <view wx:if="{{stageText}}" class="infoText">{{stageText}}</view>
-    <view wx:if="{{seasonText}}" class="seasonRow">
-      <view class="infoText seasonText">{{seasonText}}</view>
+
+    <view class="heroTipsRow">
+      <view class="heroTinyCard">
+        <view class="heroTinyTitle">按季节找</view>
+        <view class="heroTinyText">春夏秋冬都可单独筛选</view>
+      </view>
+      <view class="heroTinyCard">
+        <view class="heroTinyTitle">按分类找</view>
+        <view class="heroTinyText">主食、蛋白质、蔬菜、汤羹</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!errorText}}" class="card filterCard">
+    <view class="filterHead">
+      <view class="filterHeadMain">
+        <view class="filterTitle">筛选菜谱</view>
+        <view class="filterSubTitle">支持单独查询，也可季节与分类组合查询</view>
+      </view>
+      <view class="filterHeadBadge">轻松找菜</view>
+    </view>
+
+    <view class="filterPanel">
+      <view class="filterLine">
+        <view class="filterLabel">季节</view>
+        <view class="filterChipWrap">
+          <view
+            wx:for="{{seasonOptions}}"
+            wx:key="key"
+            class="filterChip {{activeSeason === item.key ? 'filterChipActive' : ''}}"
+            bindtap="onSeasonChange"
+            hover-class="filterChipHover"
+            hover-stay-time="70"
+            data-season="{{item.key}}"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </view>
+
+      <view class="filterLine filterLineLast">
+        <view class="filterLabel">分类</view>
+        <view class="filterChipWrap">
+          <view
+            wx:for="{{categoryOptions}}"
+            wx:key="key"
+            class="filterChip {{activeCategory === item.key ? 'filterChipActive' : ''}}"
+            bindtap="onCategoryChange"
+            hover-class="filterChipHover"
+            hover-stay-time="70"
+            data-category="{{item.key}}"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 
   <view wx:if="{{errorText}}" class="card errorCard">
-    <view class="title">小餐盘还没摆好</view>
+    <view class="title">菜谱加载失败</view>
     <view class="muted">{{errorText}}</view>
   </view>
 
-  <view wx:if="{{!errorText && !plan}}" class="card loadingCard">
+  <view wx:if="{{isLoading}}" class="card loadingCard">
     <view class="loadingDotWrap">
       <view class="loadingDot"></view>
       <view class="loadingDot"></view>
       <view class="loadingDot"></view>
     </view>
-    <view class="title">正在准备今日菜单</view>
-    <view class="muted">第一次打开可能会慢一点点，请稍等。</view>
+    <view class="title">菜谱加载中</view>
+    <view class="muted">正在整理宝宝餐菜谱，请稍等</view>
   </view>
 
-  <view wx:if="{{!errorText && plan}}" class="grid">
-    <view class="card item menuCard stapleCard" bindtap="goDetail" data-id="{{plan.staple.id}}">
-      <view class="row cardTop">
-        <view class="titleRow">
-          <view class="pill">🍚 主食</view>
-          <view class="cardTitleInline">{{plan.staple.name}}</view>
-        </view>
-        <view class="iconFavoriteBtn {{plan.staple.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{plan.staple.id}}">
-          <view class="favoriteHeart {{plan.staple.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{plan.staple.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
-        </view>
-      </view>
-      <view class="muted compactMuted">温柔饱腹，约 {{plan.staple.timeMinutes}} 分钟</view>
-      <view class="ingredientTags">
-        <view wx:for="{{plan.staple.ingredients}}" wx:key="name" class="ingredientTag">
-          {{item.name}} {{item.amount}}
-        </view>
-      </view>
-      <view class="row actions">
-        <view class="cardSpacer"></view>
-        <view class="btn viewBtn actionBtn">查看做法</view>
-      </view>
-    </view>
+  <view wx:if="{{!isLoading && !errorText && !list.length}}" class="card loadingCard">
+    <view class="title">暂时没有匹配菜谱</view>
+    <view class="muted">可以切换季节或分类，看看其他菜谱</view>
+  </view>
 
-    <view class="card item menuCard proteinCard" bindtap="goDetail" data-id="{{plan.protein.id}}">
-      <view class="row cardTop">
-        <view class="titleRow">
-          <view class="pill">🥚 蛋白质</view>
-          <view class="cardTitleInline">{{plan.protein.name}}</view>
-        </view>
-        <view class="iconFavoriteBtn {{plan.protein.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{plan.protein.id}}">
-          <view class="favoriteHeart {{plan.protein.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{plan.protein.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
-        </view>
-      </view>
-      <view class="muted compactMuted">营养满满，约 {{plan.protein.timeMinutes}} 分钟</view>
-      <view class="ingredientTags">
-        <view wx:for="{{plan.protein.ingredients}}" wx:key="name" class="ingredientTag">
-          {{item.name}} {{item.amount}}
-        </view>
-      </view>
-      <view class="row actions">
-        <view class="cardSpacer"></view>
-        <view class="btn viewBtn actionBtn">查看做法</view>
-      </view>
-    </view>
-
-    <view wx:for="{{plan.vegs}}" wx:key="id" class="card item menuCard vegCard" bindtap="goDetail" data-id="{{item.id}}">
-      <view class="row cardTop">
-        <view class="titleRow">
-          <view class="pill">🥬 蔬菜</view>
+  <view wx:if="{{!isLoading && !errorText && list.length}}" class="grid">
+    <view wx:for="{{list}}" wx:key="id" class="card item menuCard {{item.cardClass}}" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="menuCardTop">
+        <view class="menuHeaderMain">
+          <view class="menuHeaderPills">
+            <view class="pill menuTypePill">{{item.typeLabel}}</view>
+            <view class="metaBadge">{{item.seasonLabel}}</view>
+          </view>
           <view class="cardTitleInline">{{item.name}}</view>
+          <view class="cardMetaText">约 {{item.timeMinutes}} 分钟 · 步骤清晰易上手</view>
         </view>
         <view class="iconFavoriteBtn {{item.isFavorite ? 'iconFavoriteBtnActive' : ''}}" catchtap="toggleFavorite" data-id="{{item.id}}">
-          <view class="favoriteHeart {{item.isFavorite ? 'favoriteHeartActive' : ''}}"><view class="favoriteHeartInner {{item.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view></view>
+          <view class="favoriteHeart {{item.isFavorite ? 'favoriteHeartActive' : ''}}">
+            <view class="favoriteHeartInner {{item.isFavorite ? 'favoriteHeartInnerActive' : ''}}"></view>
+          </view>
         </view>
       </view>
-      <view class="muted compactMuted">清甜时令，约 {{item.timeMinutes}} 分钟</view>
-      <view class="ingredientTags">
-        <view wx:for="{{item.ingredients}}" wx:key="name" class="ingredientTag">
-          {{item.name}} {{item.amount}}
+
+      <view class="ingredientPanel">
+        <view class="ingredientPanelHead">
+          <view class="ingredientPanelTitle">本菜食材</view>
+          <view class="ingredientPanelCount">{{item.ingredients.length}} 种</view>
+        </view>
+        <view class="ingredientTags">
+          <view wx:for="{{item.ingredients}}" wx:key="name" class="ingredientTag">
+            {{item.name}} {{item.amount}}
+          </view>
         </view>
       </view>
+
       <view class="row actions">
-        <view class="cardSpacer"></view>
+        <view class="cardHint">点击卡片可查看做法步骤</view>
         <view class="btn viewBtn actionBtn">查看做法</view>
       </view>
     </view>

@@ -1,6 +1,59 @@
 .favoriteHeroCard {
   margin-bottom: 18rpx;
-  background: linear-gradient(180deg, #fff8fb 0%, #fff3f7 100%);
+  background: linear-gradient(180deg, #fffdfd 0%, #fff7fa 100%);
+  border-color: #f7e8ee;
+  box-shadow: 0 12rpx 24rpx rgba(236, 207, 216, 0.12);
+}
+
+.favoriteHeroTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.favoriteHeroTitleGroup {
+  min-width: 0;
+  flex: 1;
+}
+
+.favoriteBadgeTitle {
+  display: inline-flex;
+}
+
+.heroBadgeTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 6rpx 0;
+}
+
+.heroTitleMark {
+  width: 16rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  flex: 0 0 auto;
+  background: linear-gradient(90deg, #f3c5a9 0%, #e8bdcb 100%);
+  opacity: 0.9;
+}
+
+.heroTitleMarkRight {
+  opacity: 0.72;
+}
+
+.heroTitle {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #604d55;
+  line-height: 1.15;
+  letter-spacing: 1rpx;
+}
+
+.favoriteHeroTitleText {
+  color: #604d55;
+}
+
+.favoriteHeroSubtitle {
+  margin-top: 10rpx;
 }
 
 .searchCard {
@@ -14,8 +67,8 @@
   gap: 12rpx;
   padding: 10rpx 16rpx;
   border-radius: 999rpx;
-  background: #fff8fb;
-  border: 2rpx solid #ffdbe7;
+  background: #fffafb;
+  border: 2rpx solid #f4e0e8;
 }
 
 .searchIcon {
@@ -51,7 +104,7 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 18rpx;
 }
 
 .empty {
@@ -60,75 +113,129 @@
 }
 
 .favoriteCard {
-  background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
   position: relative;
   overflow: hidden;
-  padding: 18rpx 18rpx;
+  padding: 20rpx 20rpx 18rpx;
+  border-color: #f4e9ed;
+  background: linear-gradient(180deg, #ffffff 0%, #fffbf9 100%);
+  box-shadow: 0 10rpx 20rpx rgba(236, 205, 214, 0.12);
 }
 
 .favoriteCard::before {
   display: none;
 }
 
-.cardTop {
+.menuCardTop {
+  display: flex;
   align-items: flex-start;
-  gap: 10rpx;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
-.titleRow {
+.menuHeaderMain {
   flex: 1;
+  min-width: 0;
+}
+
+.menuHeaderPills {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  min-width: 0;
-  padding-right: 8rpx;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.menuTypePill {
+  margin-left: 4rpx;
+}
+
+.metaBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fffdfd;
+  border: 2rpx solid #f1e5ea;
+  color: #9f828c;
+  font-size: 22rpx;
+  line-height: 1.2;
 }
 
 .cardTitleInline {
-  flex: 1;
-  min-width: 0;
+  margin-top: 10rpx;
   font-size: 32rpx;
   font-weight: 700;
   color: #5f4a52;
-  line-height: 1.35;
+  line-height: 1.34;
 }
 
-.compactMuted {
-  margin-top: 6rpx;
+.cardMetaText {
+  margin-top: 10rpx;
   font-size: 23rpx;
+  color: #99838b;
+  line-height: 1.45;
 }
 
 .matchHint {
-  margin-top: 6rpx;
+  margin-top: 12rpx;
   font-size: 22rpx;
-  line-height: 1.4;
+  line-height: 1.45;
   color: #b08a94;
-  position: relative;
-  z-index: 1;
 }
 
 .matchHintLabel {
   color: #d596a8;
 }
 
+.ingredientPanel {
+  margin-top: 16rpx;
+  padding: 16rpx 14rpx 12rpx;
+  border-radius: 20rpx;
+  background: #fffdfd;
+  border: 2rpx solid #f3e8ec;
+}
+
+.ingredientPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.ingredientPanelTitle {
+  color: #6b575f;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ingredientPanelCount {
+  flex: 0 0 auto;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  border: 2rpx solid #f0e1e7;
+  color: #af9099;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
 .ingredientTags {
   display: flex;
   flex-wrap: wrap;
   gap: 8rpx;
-  margin-top: 10rpx;
-  position: relative;
-  z-index: 1;
+  margin-top: 12rpx;
 }
 
 .ingredientTag {
   max-width: 100%;
   padding: 6rpx 12rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.92);
-  border: 2rpx solid #ffe4ec;
+  background: #ffffff;
+  border: 2rpx solid #f3e6eb;
   color: #8f6d76;
   font-size: 21rpx;
   line-height: 1.25;
+  box-sizing: border-box;
 }
 
 .keywordHighlightText {
@@ -139,18 +246,21 @@
 }
 
 .actions {
-  margin-top: 10rpx;
-  justify-content: space-between;
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid #f5ebef;
   align-items: center;
-  gap: 12rpx;
 }
 
-.cardSpacer {
+.cardHint {
   flex: 1;
+  color: #af949d;
+  font-size: 22rpx;
+  line-height: 1.3;
 }
 
 .actionBtn {
-  padding: 12rpx 18rpx;
+  padding: 12rpx 20rpx;
   font-size: 23rpx;
   line-height: 1.2;
 }
@@ -158,7 +268,7 @@
 .viewBtn {
   background: linear-gradient(135deg, #ff9fba 0%, #ffb68e 100%);
   color: #ffffff;
-  box-shadow: 0 10rpx 20rpx rgba(255, 159, 186, 0.18);
+  box-shadow: 0 8rpx 16rpx rgba(255, 159, 186, 0.16);
 }
 
 @keyframes favoritePulse {
@@ -188,7 +298,6 @@
   justify-content: center;
   flex: 0 0 auto;
   position: relative;
-  z-index: 1;
 }
 
 .iconFavoriteBtn::before {
@@ -210,13 +319,14 @@
 }
 
 .iconFavoriteBtnActive::after {
-  content: "✦";
+  content: "";
   position: absolute;
-  top: 6rpx;
-  right: 8rpx;
-  font-size: 16rpx;
-  line-height: 1;
-  color: #f5b8cb;
+  top: 7rpx;
+  right: 9rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #f8c2d3;
 }
 
 .favoriteHeart {

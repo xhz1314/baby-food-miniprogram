@@ -1,7 +1,15 @@
 <view class="container">
   <view class="card favoriteHeroCard">
-    <view class="title">💗 我的收藏小餐单</view>
-    <view class="muted">把喜欢的辅食存起来，随时回来看。</view>
+    <view class="favoriteHeroTop">
+      <view class="favoriteHeroTitleGroup">
+        <view class="heroBadgeTitle favoriteBadgeTitle">
+          <view class="heroTitleMark"></view>
+          <view class="heroTitle favoriteHeroTitleText">我的收藏</view>
+          <view class="heroTitleMark heroTitleMarkRight"></view>
+        </view>
+        <view class="muted favoriteHeroSubtitle">把喜欢的宝宝餐存起来，随时回来看。</view>
+      </view>
+    </view>
   </view>
 
   <view class="card searchCard">
@@ -41,21 +49,41 @@
   </view>
 
   <view wx:if="{{!isLoading && list.length}}" class="stack">
-    <view wx:for="{{list}}" wx:key="id" class="card item favoriteCard" bindtap="goDetail" data-id="{{item.id}}">
-      <view class="row cardTop">
-        <view class="titleRow">
-          <view class="pill">
+    <view wx:for="{{list}}" wx:key="id" class="card item favoriteCard menuCard" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="menuCardTop">
+        <view class="menuHeaderMain">
+          <view class="menuHeaderPills">
+            <view class="pill menuTypePill">
+              <text
+                wx:for="{{item.typeSegments}}"
+                wx:key="idx"
+                wx:for-item="segment"
+                wx:for-index="idx"
+                class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+              >{{segment.text}}</text>
+            </view>
+            <view class="metaBadge">
+              <text
+                wx:for="{{item.seasonSegments}}"
+                wx:key="idx"
+                wx:for-item="segment"
+                wx:for-index="idx"
+                class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+              >{{segment.text}}</text>
+            </view>
+          </view>
+          <view class="cardTitleInline">
             <text
-              wx:for="{{item.typeSegments}}"
+              wx:for="{{item.titleSegments}}"
               wx:key="idx"
               wx:for-item="segment"
               wx:for-index="idx"
               class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
             >{{segment.text}}</text>
           </view>
-          <view class="cardTitleInline">
+          <view class="cardMetaText">
             <text
-              wx:for="{{item.titleSegments}}"
+              wx:for="{{item.timeSegments}}"
               wx:key="idx"
               wx:for-item="segment"
               wx:for-index="idx"
@@ -67,15 +95,7 @@
           <view class="favoriteHeart favoriteHeartActive"><view class="favoriteHeartInner favoriteHeartInnerActive"></view></view>
         </view>
       </view>
-      <view class="muted compactMuted">
-        <text
-          wx:for="{{item.timeSegments}}"
-          wx:key="idx"
-          wx:for-item="segment"
-          wx:for-index="idx"
-          class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
-        >{{segment.text}}</text>
-      </view>
+
       <view wx:if="{{item.matchHint}}" class="matchHint">
         <text class="matchHintLabel">命中{{item.matchHint.label}}：</text>
         <text
@@ -86,19 +106,27 @@
           class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
         >{{segment.text}}</text>
       </view>
-      <view class="ingredientTags">
-        <view wx:for="{{item.ingredientTags}}" wx:key="key" wx:for-item="ingredientTag" class="ingredientTag">
-          <text
-            wx:for="{{ingredientTag.segments}}"
-            wx:key="idx"
-            wx:for-item="segment"
-            wx:for-index="idx"
-            class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
-          >{{segment.text}}</text>
+
+      <view class="ingredientPanel">
+        <view class="ingredientPanelHead">
+          <view class="ingredientPanelTitle">本菜食材</view>
+          <view class="ingredientPanelCount">{{item.ingredientTags.length}} 种</view>
+        </view>
+        <view class="ingredientTags">
+          <view wx:for="{{item.ingredientTags}}" wx:key="key" wx:for-item="ingredientTag" class="ingredientTag">
+            <text
+              wx:for="{{ingredientTag.segments}}"
+              wx:key="idx"
+              wx:for-item="segment"
+              wx:for-index="idx"
+              class="{{segment.highlighted ? 'keywordHighlightText' : ''}}"
+            >{{segment.text}}</text>
+          </view>
         </view>
       </view>
+
       <view class="row actions">
-        <view class="cardSpacer"></view>
+        <view class="cardHint">点击卡片可查看做法步骤</view>
         <view class="btn viewBtn actionBtn">查看做法</view>
       </view>
     </view>
