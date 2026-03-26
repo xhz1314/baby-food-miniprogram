@@ -1,5 +1,6 @@
 var dataModule = null
 var favoritesModule = null
+var shareModule = null
 
 var SEASON_OPTIONS = [
   { key: "all", label: "全部" },
@@ -35,6 +36,13 @@ function getFavoritesModule() {
     favoritesModule = require("../../utils/favorites")
   }
   return favoritesModule
+}
+
+function getShareModule() {
+  if (!shareModule) {
+    shareModule = require("../../utils/share")
+  }
+  return shareModule
 }
 
 function getTypeLabel(type) {
@@ -220,15 +228,35 @@ Page({
     errorText: "",
     isLoading: true
   },
-  onLoad: function () {
+  onLoad: function (query) {
+    var filterState = getShareModule().normalizeIndexFilter(query)
+
+    getShareModule().showShareMenu()
+    this.setData({
+      activeSeason: filterState.season,
+      activeCategory: filterState.category
+    })
     this.refreshList()
   },
   onShow: function () {
+    getShareModule().showShareMenu()
+
     if (this.data.isLoading) {
       this.refreshList()
       return
     }
     this.syncFavoriteState()
+  },
+  onShareAppMessage: function () {
+    return getShareModule().buildIndexShareMeta(this.data)
+  },
+  onShareTimeline: function () {
+    var shareMeta = getShareModule().buildIndexShareMeta(this.data)
+
+    return {
+      title: shareMeta.title,
+      query: shareMeta.query
+    }
   },
   refreshList: function () {
     try {

@@ -1,5 +1,6 @@
 let favoritesModule = null
 let dataModule = null
+let shareModule = null
 
 function hideBootLoading() {
   try {
@@ -19,6 +20,13 @@ function getDataModule() {
     dataModule = require("../../utils/data")
   }
   return dataModule
+}
+
+function getShareModule() {
+  if (!shareModule) {
+    shareModule = require("../../utils/share")
+  }
+  return shareModule
 }
 
 const SEPARATOR_REGEXP = /[\s|/、，,。；;：:（）()【】\[\]\-]/
@@ -360,7 +368,18 @@ Page({
     isLoading: true
   },
   onShow() {
+    getShareModule().showShareMenu()
     this.scheduleLoad()
+  },
+  onShareAppMessage() {
+    return getShareModule().buildFavoriteShareMeta()
+  },
+  onShareTimeline() {
+    const shareMeta = getShareModule().buildFavoriteShareMeta()
+    return {
+      title: shareMeta.title,
+      query: shareMeta.query
+    }
   },
   scheduleLoad() {
     if (this._loadPending) return
@@ -396,11 +415,11 @@ Page({
     getFavoritesModule().removeFavoriteById(id)
     const fullList = buildList()
     hideBootLoading()
-      this.setData({
-        fullList,
-        list: filterList(fullList, this.data.keyword),
-        isLoading: false
-      })
+    this.setData({
+      fullList,
+      list: filterList(fullList, this.data.keyword),
+      isLoading: false
+    })
     wx.showToast({ title: "已取消收藏", icon: "success" })
   },
   goDetail(e) {

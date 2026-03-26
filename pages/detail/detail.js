@@ -1,4 +1,5 @@
 let favoritesModule = null
+let shareModule = null
 
 function hideBootLoading() {
   try {
@@ -13,6 +14,13 @@ function getFavoritesModule() {
   return favoritesModule
 }
 
+function getShareModule() {
+  if (!shareModule) {
+    shareModule = require("../../utils/share")
+  }
+  return shareModule
+}
+
 Page({
   data: {
     id: "",
@@ -22,13 +30,25 @@ Page({
   },
   onLoad(query) {
     const id = (query && query.id) || ""
+    getShareModule().showShareMenu()
     this.setData({ id, isLoading: true })
     this.scheduleLoad(id)
   },
   onShow() {
     const id = this.data.id
+    getShareModule().showShareMenu()
     if (!id) return
     this.scheduleLoad(id)
+  },
+  onShareAppMessage() {
+    return getShareModule().buildRecipeShareMeta(this.data.recipe, this.data.id)
+  },
+  onShareTimeline() {
+    const shareMeta = getShareModule().buildRecipeShareMeta(this.data.recipe, this.data.id)
+    return {
+      title: shareMeta.title,
+      query: shareMeta.query
+    }
   },
   scheduleLoad(id) {
     if (!id) {
