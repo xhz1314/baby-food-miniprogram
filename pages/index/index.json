@@ -4,5 +4,7 @@
   "backgroundTextStyle": "dark",
   "backgroundColor": "#fff4f7",
   "backgroundColorTop": "#fff0f5",
-  "backgroundColorBottom": "#fff7f8"
+  "backgroundColorBottom": "#fff7f8",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }
